@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<Properties>
+		<Property name="Def.Appender.Ref">STDOUT</Property>
+		<Property name="cloud.pattern.Layout">%-5p [%t] %C{1} (%M:%L) %X [cf_application_name=${sys:mdc_cf_app_name}, cf_space_name=${sys:mdc_cf_space_name}, cf_application_version=${sys:mdc_cf_app_version}, cf_instance_id=${sys:mdc_cf_instance_id}]- %mask%n</Property>
+        <Property name="Def.Pattern.Layout">%d %-5p [%t] %C{1} (%M:%L) %X- %mask%n</Property>
+		<Property name="Def.Log.Level">info</Property>
+	</Properties>
+
+
+	<Appenders>
+		<Console name="STDOUT" target="SYSTEM_OUT">
+		<PatternLayout>
+			<ScriptPatternSelector defaultPattern="${Def.Pattern.Layout}">
+                        <Script name="EnvironmentSelector" language="javascript"><![CDATA[
+                            result=null;
+                            if (com.github.spranshu1.api.log.pattern.LogPattern.environment=="cloud")
+                            {
+                                result=com.github.spranshu1.api.log.pattern.LogPattern.environment;
+                            }
+                            result;
+                            ]]>
+						</Script>
+                        <PatternMatch key="cloud" pattern="${cloud.pattern.Layout}"/>
+                    </ScriptPatternSelector>
+        </PatternLayout>
+		</Console>
+		<Console name="STDERR" target="SYSTEM_ERR">
+			<PatternLayout>
+			<ScriptPatternSelector defaultPattern="${Def.Pattern.Layout}">
+                        <Script name="EnvironmentSelector" language="javascript"><![CDATA[
+                            result=null;
+                            if (com.github.spranshu1.api.log.pattern.LogPattern.environment=="cloud")
+                            {
+                                result=com.github.spranshu1.api.log.pattern.LogPattern.environment;
+                            }
+                            result;
+                            ]]>
+						</Script>
+                        <PatternMatch key="cloud" pattern="${cloud.pattern.Layout}"/>
+                    </ScriptPatternSelector>
+        </PatternLayout>
+		</Console>
+	</Appenders>
+
+	<Loggers>
+		<!-- Default logging -->
+		<Root level="${Def.Log.Level}">
+			<AppenderRef ref="${Def.Appender.Ref}" level="DEBUG" />
+			<AppenderRef ref="STDERR" level="WARN" />
+		</Root>
+	</Loggers>
+
+</Configuration>
