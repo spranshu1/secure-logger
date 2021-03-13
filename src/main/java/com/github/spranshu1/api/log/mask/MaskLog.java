@@ -41,17 +41,17 @@ public class MaskLog extends LogEventPatternConverter {
     /**
      * HashMap for storing masking keys and corresponding search and replace pattern
      */
-    private static final Map<String, String> hm = new HashMap<String, String>();
+    private static final Map<String, String> hm = new HashMap<>();
 
     /**
      * ArrayList for storing search pattern
      */
-    private static final List<String> searchList = new ArrayList<String>();
+    private static final List<String> searchList = new ArrayList<>();
 
     /**
      * ArrayList for storing replacement pattern
      */
-    private static final List<String> replaceList = new ArrayList<String>();
+    private static final List<String> replaceList = new ArrayList<>();
 
     /**
      * Variable for storing length of keys
@@ -87,6 +87,7 @@ public class MaskLog extends LogEventPatternConverter {
 
     /**
      * Method to get the new instance.
+     * @return MaskLog The instance
      */
     public static MaskLog newInstance() {
         return new MaskLog();
@@ -115,14 +116,14 @@ public class MaskLog extends LogEventPatternConverter {
         if (System.getProperty(LOGMASKINGKEYS) == null || System.getProperty(LOGMASKINGKEYS).equalsIgnoreCase("")) {
             loadPropertyFile(APP_PROP_FILE);
         } else {
-            final String appRegexKeys[] = System.getProperty(LOGMASKINGKEYS).split(",");
+            final String[] appRegexKeys = System.getProperty(LOGMASKINGKEYS).split(",");
             for (final String regexKey : appRegexKeys) {
                 hm.put(regexKey, prop.getProperty(regexKey + ".search") + regexKey + prop.getProperty(regexKey + ".replace"));
             }
         }
         // forEach(action) method to iterate map
         hm.forEach((key, value) -> {
-                    final String obj[] = value.split(key);
+                    final String[] obj = value.split(key);
                     searchList.add(obj[0]);
                     replaceList.add(obj[1]);
                 }
@@ -141,13 +142,13 @@ public class MaskLog extends LogEventPatternConverter {
                 prop.load(input);
             }
             if (prop.getProperty(LOGMASKINGKEYS) != null) {
-                final String appRegexKeys[] = prop.getProperty(LOGMASKINGKEYS).split(",");
-                for (int i = 0; i < appRegexKeys.length; i++) {
-                    hm.put(appRegexKeys[i], prop.getProperty(appRegexKeys[i] + ".search") + appRegexKeys[i] + prop.getProperty(appRegexKeys[i] + ".replace"));
+                final String[] appRegexKeys = prop.getProperty(LOGMASKINGKEYS).split(",");
+                for (String appRegexKey : appRegexKeys) {
+                    hm.put(appRegexKey, prop.getProperty(appRegexKey + ".search") + appRegexKey + prop.getProperty(appRegexKey + ".replace"));
                 }
             }
         } catch (IOException ex) {
-            LOGGER.error("Exception - {}", ex);
+            LOGGER.error("Exception - ", ex);
         }
     }
 }
