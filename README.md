@@ -136,7 +136,7 @@ Some of the commonly used methods in MDC which are equivalent to ThreadContext m
 
 ## Release Log ##
 
-0.1.0  First Version
+1.0.0  First Version
 
 
 ## Author ##

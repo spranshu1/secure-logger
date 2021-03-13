@@ -20,110 +20,135 @@ import java.util.*;
  */
 
 @Plugin(name = "MaskLog", category = "Converter")
-@ConverterKeys({ "mask"})
+@ConverterKeys({"mask"})
 public class MaskLog extends LogEventPatternConverter {
 
-	/** The Constant logger. */
-	private static final Logger LOGGER = LoggerFactory.getLogger(MaskLog.class);
+    /**
+     * The Constant logger.
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(MaskLog.class);
 
-	/** marker for skipping the log masking. */
-	public static final Marker SKIP_MARKER = MarkerFactory.getMarker("SKIP_MASKING_MARKER");
+    /**
+     * marker for skipping the log masking.
+     */
+    public static final Marker SKIP_MARKER = MarkerFactory.getMarker("SKIP_MASKING_MARKER");
 
-	/** Property variable. */
-	private static Properties prop;
+    /**
+     * Property variable.
+     */
+    private static Properties prop;
 
-	/** HashMap for storing masking keys and corresponding search and replace pattern */
-	private static Map<String, String>hm=new HashMap<String, String>();
+    /**
+     * HashMap for storing masking keys and corresponding search and replace pattern
+     */
+    private static final Map<String, String> hm = new HashMap<>();
 
-	/** ArrayList for storing search pattern */
-	private static List<String>searchList=new ArrayList<String>();
+    /**
+     * ArrayList for storing search pattern
+     */
+    private static final List<String> searchList = new ArrayList<>();
 
-	/** ArrayList for storing replacement pattern */
-	private static List<String>replaceList=new ArrayList<String>();
+    /**
+     * ArrayList for storing replacement pattern
+     */
+    private static final List<String> replaceList = new ArrayList<>();
 
-	/** Variable for storing length of keys */
-	private static int length;
+    /**
+     * Variable for storing length of keys
+     */
+    private static int length;
 
-	/** Variable for storing attribute name of keys */
-	private static final String LOGMASKINGKEYS="LogMaskingKeys";
-	
-	/** Variable for storing commons property name */
-	private static final String COMMON_PROP_FILE="common-log-masking.properties";
-	
-	/** Variable for storing application property name */
-	private static final String APP_PROP_FILE="application.properties";
-	
-	
-			
-	
+    /**
+     * Variable for storing attribute name of keys
+     */
+    private static final String LOGMASKINGKEYS = "LogMaskingKeys";
 
-	static {
-		createMaskingKeysMap();
-	}
+    /**
+     * Variable for storing commons property name
+     */
+    private static final String COMMON_PROP_FILE = "common-log-masking.properties";
 
-	/** Default constructor to call super class constructor. */
-	public MaskLog () {
-		super("m", "m");
-	}
+    /**
+     * Variable for storing application property name
+     */
+    private static final String APP_PROP_FILE = "application.properties";
 
-	/** Method to get the new instance. */
-	public static MaskLog newInstance() {
-		return new MaskLog ();
-	}
 
-	/** this method is responsible for actually masking the log. */
-	@Override
-	public void  format(final LogEvent logEvent, final StringBuilder outputMsg) {
+    static {
+        createMaskingKeysMap();
+    }
 
-		String message = logEvent.getMessage().getFormattedMessage();
-		// mask log only if no marker is set in the log statement or marker other then SKIP_MARKER
-		if(logEvent.getMarker()==null || !logEvent.getMarker().getName().equalsIgnoreCase("SKIP_MASKING_MARKER")) {
-			for (int i=0;i<length;i++) {
-				message=message.replaceAll(searchList.get(i),replaceList.get(i));
-			}
-		}
-		outputMsg.append(message);
-	}
+    /**
+     * Default constructor to call super class constructor.
+     */
+    public MaskLog() {
+        super("m", "m");
+    }
 
-	private static void createMaskingKeysMap() {
+    /**
+     * Method to get the new instance.
+     * @return MaskLog The instance
+     */
+    public static MaskLog newInstance() {
+        return new MaskLog();
+    }
 
-		loadPropertyFile(COMMON_PROP_FILE);
-		// get the keys from system property of consumer else load the properties file
-		if(System.getProperty(LOGMASKINGKEYS)==null ||System.getProperty(LOGMASKINGKEYS).equalsIgnoreCase("")) {
-			loadPropertyFile(APP_PROP_FILE);
-		}else {
-			final String appRegexKeys[]=System.getProperty(LOGMASKINGKEYS).split(",");
-			for(final String regexKey:appRegexKeys) {
-				hm.put(regexKey,prop.getProperty(regexKey+".search")+regexKey+prop.getProperty(regexKey+".replace"));
-			}	
-		}
-		// forEach(action) method to iterate map
-		hm.forEach((key,value) -> {
-			final String obj[]=value.split(key);
-			searchList.add(obj[0]);
-			replaceList.add(obj[1]);}
-				);
-		length=searchList.size();
-	}
+    /**
+     * this method is responsible for actually masking the log.
+     */
+    @Override
+    public void format(final LogEvent logEvent, final StringBuilder outputMsg) {
 
-	private static void loadPropertyFile(final String fileName) {
+        String message = logEvent.getMessage().getFormattedMessage();
+        // mask log only if no marker is set in the log statement or marker other then SKIP_MARKER
+        if (logEvent.getMarker() == null || !logEvent.getMarker().getName().equalsIgnoreCase("SKIP_MASKING_MARKER")) {
+            for (int i = 0; i < length; i++) {
+                message = message.replaceAll(searchList.get(i), replaceList.get(i));
+            }
+        }
+        outputMsg.append(message);
+    }
 
-		final Properties prop = new Properties();
-		InputStream input;
-		try {
-			Thread.currentThread().getContextClassLoader();
-			input = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-			if(input!=null) {
-				prop.load(input);
-			}
-			if(prop.getProperty(LOGMASKINGKEYS)!=null) {
-				final String appRegexKeys[]=prop.getProperty(LOGMASKINGKEYS).split(",");
-				for(int i=0;i<appRegexKeys.length;i++) {
-					hm.put(appRegexKeys[i],prop.getProperty(appRegexKeys[i]+".search")+appRegexKeys[i]+prop.getProperty(appRegexKeys[i]+".replace"));
-				}
-			}
-		} catch (IOException ex) {
-			LOGGER.error("Exception - {}", ex);
-		}
-	}
+    private static void createMaskingKeysMap() {
+
+        loadPropertyFile(COMMON_PROP_FILE);
+        // get the keys from system property of consumer else load the properties file
+        if (System.getProperty(LOGMASKINGKEYS) == null || System.getProperty(LOGMASKINGKEYS).equalsIgnoreCase("")) {
+            loadPropertyFile(APP_PROP_FILE);
+        } else {
+            final String[] appRegexKeys = System.getProperty(LOGMASKINGKEYS).split(",");
+            for (final String regexKey : appRegexKeys) {
+                hm.put(regexKey, prop.getProperty(regexKey + ".search") + regexKey + prop.getProperty(regexKey + ".replace"));
+            }
+        }
+        // forEach(action) method to iterate map
+        hm.forEach((key, value) -> {
+                    final String[] obj = value.split(key);
+                    searchList.add(obj[0]);
+                    replaceList.add(obj[1]);
+                }
+        );
+        length = searchList.size();
+    }
+
+    private static void loadPropertyFile(final String fileName) {
+
+        final Properties prop = new Properties();
+        InputStream input;
+        try {
+            Thread.currentThread().getContextClassLoader();
+            input = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+            if (input != null) {
+                prop.load(input);
+            }
+            if (prop.getProperty(LOGMASKINGKEYS) != null) {
+                final String[] appRegexKeys = prop.getProperty(LOGMASKINGKEYS).split(",");
+                for (String appRegexKey : appRegexKeys) {
+                    hm.put(appRegexKey, prop.getProperty(appRegexKey + ".search") + appRegexKey + prop.getProperty(appRegexKey + ".replace"));
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.error("Exception - ", ex);
+        }
+    }
 }
