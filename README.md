@@ -11,7 +11,7 @@
 
 ## Version ##
 
-`1.0.0`
+`1.0.1`
 
 
 
@@ -135,6 +135,8 @@ Some of the commonly used methods in MDC which are equivalent to ThreadContext m
 ---
 
 ## Release Log ##
+
+1.0.1 Added support to mask logs in `Cloud Foundry` console
 
 1.0.0  First Version
 
