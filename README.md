@@ -1,5 +1,7 @@
 # Secure Logger #
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/62ebdf2938b147e982b62fe4bd393377)](https://www.codacy.com/gh/spranshu1/secure-logger/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=spranshu1/secure-logger&amp;utm_campaign=Badge_Grade) ![Maven Build](https://github.com/spranshu1/secure-logger/workflows/Maven%20Build/badge.svg?branch=master)
+
 * [Version](#markdown-header-version)
 * [Summary](#markdown-header-summary)
 * [Prerequisites](#markdown-header-prerequisites)
